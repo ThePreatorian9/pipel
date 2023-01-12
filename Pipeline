@@ -1,0 +1,53 @@
+pipeline {
+    agent any 
+    stages {
+        stage('Checkout external') {
+        steps {
+            git branch: 'main',
+                credentialsId: '23',
+                url: 'https://github.com/ThePreatorian9/pipel.git'
+
+            sh "ls -lat"
+            sh "pwd"
+            sh " whoami"
+        }
+    }
+    stage('test nouveau code') { 
+            steps {
+                sh " echo 'sonar part' "
+                sh " sleep 2"
+                // 
+            }
+        }
+        stage('Build') { 
+            steps {
+            
+            	sh " sudo docker stop Helloflask  || true && sudo docker rm Helloflask || true  "                
+		 sh " sudo docker rmi simple-flask-app  || true "
+                sh "sudo docker build -t simple-flask-app . || true "
+                // 
+            }
+        }
+        stage('Deploy') { 
+            steps {
+
+                sh " sudo docker run -d -p 5000:5000 --name Helloflask simple-flask-app || true "
+                // 
+            }
+        }
+        stage('check Services') { 
+            steps {
+                sh " curl http://10.0.2.15:5000/"
+                // 
+            }
+        }
+        stage('TestDocker') { 
+            steps {
+                
+                //sh "git clone https://github.com/docker/docker-bench-security.git || true"
+                sh "cd docker-bench-security && sudo sh docker-bench-security.sh > testenvironement.txt"
+                // 
+            }
+        }
+    }
+}
